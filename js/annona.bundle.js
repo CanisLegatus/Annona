@@ -8,7 +8,7 @@
  * @param {string} id - ID элемента
  * @returns {HTMLElement|null}
  */
-$ = (id) => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
 /**
  * Преобразование значения в число
@@ -93,6 +93,7 @@ function isValidExcelFile(filename) {
  * Хранит все данные приложения и настройки
  */
 
+const state = {
   rawItems: [],
   analyzedItems: [],
   excludedItems: [],
@@ -182,6 +183,8 @@ function destroyAllCharts() {
  * Классификация товаров, расчёт рекомендаций, определение статусов
  */
 
+import { state, getSettings, setAnalyzedItems, getExcludedItems } from './state.js';
+import { num } from './utils.js';
 
 /**
  * Анализ всех товаров
@@ -441,11 +444,16 @@ function orderChangeText(it) {
   return `✓ Заказ без изменений (${it.orderFinal} шт).`;
 }
 
+// removed export: { orderChangeText };
 /**
  * ANNONA — Модуль работы с файлами (File Handler)
  * Загрузка, чтение и парсинг Excel-файлов
  */
 
+import { $, num, showToast, isValidExcelFile } from './utils.js';
+import { state, setStoreInfo, setRawItems, getAllCubes, setAllCubes, getSettings } from './state.js';
+import { analyzeAll } from './analyzer.js';
+import { renderApp, renderCubeFilters } from './ui.js';
 
 /**
  * Инициализация обработчиков загрузки файлов
@@ -705,6 +713,9 @@ function parseItemRow(row, colMap, cubeSet) {
  * Отрисовка таблиц, графиков, KPI и обновление интерфейса
  */
 
+import { $, fmt, fmtMoney, escapeHtml } from './utils.js';
+import { state, getSettings, updateSettings, getAnalyzedItems, getExcludedItems, getAllCubes, getStoreInfo, destroyAllCharts, setChart, getCurrentTab, setCurrentTab } from './state.js';
+import { analyzeAll } from './analyzer.js';
 
 /**
  * Главная функция отрисовки приложения
@@ -1177,6 +1188,9 @@ function exportToExcel() {
  * Инициализация и запуск приложения
  */
 
+import { initFileHandlers } from './fileHandler.js';
+import { initUIHandlers } from './ui.js';
+import { showToast } from './utils.js';
 
 /**
  * Точка входа в приложение

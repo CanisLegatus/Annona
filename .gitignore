@@ -1,1 +1,6 @@
-(empty)
+```
+# Build artifacts
+*.bundle.js
+dist/
+build/
+```
