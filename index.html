@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annona — Помощник заказов</title>
+  
+  <!-- External Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cinzel@latest/latin-700-normal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cinzel@latest/latin-600-normal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cinzel@latest/latin-400-normal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-400-normal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-600-normal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/cormorant-garamond@latest/latin-700-normal.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="glass-strong sticky top-0 z-40">
+  <div class="meander-border"></div>
+  <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#a8842c] to-[#c9a961] flex items-center justify-center shadow-md">
+        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 21h16M5 21V10M19 21V10M3 10h18l-2-4H5l-2 4zM7 10V7M12 10V7M17 10V7M9 21v-7h6v7"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-display font-bold text-[#8a6d1f] tracking-widest">ANNONA</h1>
+        <p class="text-xs text-[#8a8171] tracking-widest uppercase">Cura Abundantiae · Помощник заказов</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div id="storeInfo" class="hidden text-right mr-2">
+        <div id="storeName" class="text-sm font-bold text-[#2f2b23]"></div>
+        <div id="orderMeta" class="text-xs text-[#8a8171]"></div>
+      </div>
+      <button id="settingsBtn" class="p-2.5 rounded-xl glass hover:bg-white transition" title="Настройки">
+        <svg class="w-5 h-5 text-[#8a6d1f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </button>
+      <button id="reloadBtn" class="hidden p-2.5 rounded-xl glass hover:bg-white transition" title="Загрузить новый файл">
+        <svg class="w-5 h-5 text-[#8a6d1f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- SETTINGS PANEL -->
+<div id="settingsPanel" class="settings-panel fixed top-0 right-0 h-full w-[420px] z-50 overflow-y-auto scrollbar-thin" style="background:#fdfbf4; border-left:1px solid var(--gold-border); box-shadow:-8px 0 30px rgba(90,75,40,0.12);">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-display font-bold text-[#8a6d1f]">Параметры Анноны</h2>
+      <button id="closeSettings" class="p-2 rounded-lg hover:bg-[rgba(168,132,44,0.1)]">
+        <svg class="w-5 h-5 text-[#6f6757]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-6">
+      <div>
+        <label class="block text-base font-bold text-[#2f2b23] mb-2">⚖️ Целевой запас (дни)</label>
+        <div class="flex items-center gap-3">
+          <input id="targetDaysMin" type="number" value="24" min="7" max="90" class="w-20 px-3 py-2 rounded-lg text-center">
+          <span class="text-[#8a8171]">—</span>
+          <input id="targetDaysMax" type="number" value="30" min="7" max="90" class="w-20 px-3 py-2 rounded-lg text-center">
+          <span class="text-sm text-[#8a8171]">дней</span>
+        </div>
+        <p class="text-sm text-[#8a8171] mt-1">Диапазон оптимального запаса на момент поставки</p>
+      </div>
+
+      <div>
+        <label class="block text-base font-bold text-[#2f2b23] mb-2">🏺 Критический пересток</label>
+        <div class="flex items-center gap-2">
+          <input id="overstockThreshold" type="number" value="60" min="30" max="180" class="w-24 px-3 py-2 rounded-lg text-center">
+          <span class="text-sm text-[#8a8171]">дней</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-base font-bold text-[#2f2b23] mb-2">🐎 Дней до поставки</label>
+        <div class="flex items-center gap-2">
+          <input id="leadTimeDays" type="number" value="6" min="1" max="14" class="w-24 px-3 py-2 rounded-lg text-center">
+          <span class="text-sm text-[#8a8171]">дней (пятница → четверг)</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-base font-bold text-[#2f2b23] mb-2">🔮 Порог аномалии продаж</label>
+        <div class="flex items-center gap-2">
+          <input id="anomalyMultiplier" type="number" value="2" min="1.5" max="5" step="0.1" class="w-24 px-3 py-2 rounded-lg text-center">
+          <span class="text-sm text-[#8a8171]">× от среднего</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-base font-bold text-[#2f2b23] mb-2">💀 Порог неликвида</label>
+        <div class="flex items-center gap-2">
+          <input id="deadStockThreshold" type="number" value="2" min="0" max="20" class="w-24 px-3 py-2 rounded-lg text-center">
+          <span class="text-sm text-[#8a8171]">шт за 4 недели</span>
+        </div>
+      </div>
+
+      <div class="ornament-divider text-xs font-display tracking-widest">КУБА · ИСКЛЮЧЕНО = ✓</div>
+      <div id="cubeFilters" class="space-y-1"></div>
+
+      <button id="applySettings" class="w-full btn-gold py-3 rounded-xl text-sm">Применить и пересчитать</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD SCREEN -->
+<div id="uploadScreen" class="max-w-3xl mx-auto px-6 py-20">
+  <div class="text-center mb-10 fade-in">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-6">
+      <span class="w-2 h-2 rounded-full bg-[#5f7d2a] pulse-dot"></span>
+      <span class="text-xs text-[#6f6757] font-bold tracking-wider uppercase font-display">Система готова к анализу</span>
+    </div>
+    <h2 class="text-4xl font-display font-bold text-[#2f2b23] mb-3">Загрузите свиток заказа</h2>
+    <p class="text-[#8a8171] text-lg">Формат .xlsx · Быстрее, чем полёт стрелы</p>
+  </div>
+
+  <div id="dropZone" class="upload-zone glass rounded-2xl p-16 text-center cursor-pointer fade-in">
+    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#a8842c]/15 to-[#c9a961]/10 flex items-center justify-center border border-[#a8842c]/30">
+      <svg class="w-10 h-10 text-[#a8842c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <p class="text-xl font-display font-bold text-[#2f2b23] mb-2">Перетащите свиток сюда</p>
+    <p class="text-[#8a8171] mb-4">или</p>
+    <button id="selectFileBtn" class="btn-primary px-6 py-2.5 rounded-xl text-sm">Выбрать файл</button>
+    <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden">
+  </div>
+
+  <div class="grid grid-cols-3 gap-4 mt-10 fade-in">
+    <div class="glass rounded-xl p-4 text-center">
+      <div class="text-2xl mb-1">🏛️</div>
+      <div class="text-sm text-[#6f6757]">Глубокий анализ остатков и продаж</div>
+    </div>
+    <div class="glass rounded-xl p-4 text-center">
+      <div class="text-2xl mb-1">⚖️</div>
+      <div class="text-sm text-[#6f6757]">Защита от пустой полки и перестока</div>
+    </div>
+    <div class="glass rounded-xl p-4 text-center">
+      <div class="text-2xl mb-1">📜</div>
+      <div class="text-sm text-[#6f6757]">Экспорт рекомендаций в Excel</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden max-w-[1600px] mx-auto px-6 py-6">
+
+  <!-- KPI -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6 fade-in">
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#a8842c;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Всего SKU</div>
+      <div id="kpiTotalSku" class="text-2xl font-display font-bold text-[#2f2b23]">—</div>
+    </div>
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#b3392b;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Критич. разрыв</div>
+      <div id="kpiCritical" class="text-2xl font-display font-bold text-[#b3392b]">—</div>
+    </div>
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#c07818;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Риск недостока</div>
+      <div id="kpiUnderstock" class="text-2xl font-display font-bold text-[#c07818]">—</div>
+    </div>
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#5f7d2a;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Пересток</div>
+      <div id="kpiOverstock" class="text-2xl font-display font-bold text-[#5f7d2a]">—</div>
+    </div>
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#8b2635;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Аномалии</div>
+      <div id="kpiAnomalies" class="text-2xl font-display font-bold text-[#8b2635]">—</div>
+    </div>
+    <div class="kpi-card glass rounded-xl p-4" style="--accent:#2e5090;">
+      <div class="text-[10px] text-[#8a8171] mb-1 uppercase tracking-wider font-display font-bold">Норма</div>
+      <div id="kpiNormal" class="text-2xl font-display font-bold text-[#2e5090]">—</div>
+    </div>
+  </div>
+
+  <!-- FINANCE -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 fade-in">
+    <div class="glass rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-xs text-[#8a8171] uppercase tracking-wider font-display font-bold">Сумма текущего заказа</div>
+        <span class="text-xl">🏺</span>
+      </div>
+      <div id="sumCurrent" class="text-2xl font-display font-bold text-[#2f2b23]">—</div>
+      <div class="text-sm text-[#8a8171] mt-1">руб. · Заказ итого</div>
+    </div>
+    <div class="glass rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-xs text-[#8a8171] uppercase tracking-wider font-display font-bold">Сумма после Анноны</div>
+        <span class="text-xl">⚖️</span>
+      </div>
+      <div id="sumOptimized" class="text-2xl font-display font-bold text-[#2f2b23]">—</div>
+      <div id="sumDelta" class="text-sm mt-1 font-semibold">—</div>
+    </div>
+    <div class="glass rounded-xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-xs text-[#8a8171] uppercase tracking-wider font-display font-bold">Исключено (куба)</div>
+        <span class="text-xl">🚫</span>
+      </div>
+      <div id="excludedCount" class="text-2xl font-display font-bold text-[#2f2b23]">—</div>
+      <div class="text-sm text-[#8a8171] mt-1">позиций вне расчёта</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 fade-in">
+    <div class="glass rounded-xl p-5">
+      <div class="text-sm font-display font-bold text-[#2f2b23] mb-4 tracking-wide">Распределение по статусам</div>
+      <div class="relative" style="height: 240px;"><canvas id="chartStatus"></canvas></div>
+    </div>
+    <div class="glass rounded-xl p-5">
+      <div class="text-sm font-display font-bold text-[#2f2b23] mb-4 tracking-wide">Было / Стало · топ-10 по сумме</div>
+      <div class="relative" style="height: 240px;"><canvas id="chartCompare"></canvas></div>
+    </div>
+    <div class="glass rounded-xl p-5">
+      <div class="text-sm font-display font-bold text-[#2f2b23] mb-4 tracking-wide">Распределение запаса дней</div>
+      <div class="relative" style="height: 240px;"><canvas id="chartDays"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABS + TABLE -->
+  <div class="glass rounded-xl overflow-hidden fade-in">
+    <div class="flex items-center gap-2 p-3 border-b border-[rgba(168,132,44,0.15)] overflow-x-auto scrollbar-thin">
+      <button class="tab-btn active px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="critical">
+        <span class="w-2 h-2 rounded-full bg-[#b3392b]"></span>Критический разрыв
+        <span id="countCritical" class="badge bg-[#b3392b]/10 text-[#b3392b] border border-[#b3392b]/30">0</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="understock">
+        <span class="w-2 h-2 rounded-full bg-[#c07818]"></span>Риск недостока
+        <span id="countUnderstock" class="badge bg-[#c07818]/10 text-[#c07818] border border-[#c07818]/30">0</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="overstock">
+        <span class="w-2 h-2 rounded-full bg-[#5f7d2a]"></span>Пересток
+        <span id="countOverstock" class="badge bg-[#5f7d2a]/10 text-[#5f7d2a] border border-[#5f7d2a]/30">0</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="anomalies">
+        <span class="w-2 h-2 rounded-full bg-[#8b2635]"></span>Аномалии
+        <span id="countAnomalies" class="badge bg-[#8b2635]/10 text-[#8b2635] border border-[#8b2635]/30">0</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="promo">
+        <span class="w-2 h-2 rounded-full bg-[#a8842c]"></span>Промо
+        <span id="countPromo" class="badge bg-[#a8842c]/10 text-[#a8842c] border border-[#a8842c]/30">0</span>
+      </button>
+      <button class="tab-btn px-4 py-2.5 rounded-lg text-sm font-display font-bold whitespace-nowrap flex items-center gap-2 text-[#6f6757]" data-tab="normal">
+        <span class="w-2 h-2 rounded-full bg-[#2e5090]"></span>Норма
+        <span id="countNormal" class="badge bg-[#2e5090]/10 text-[#2e5090] border border-[#2e5090]/30">0</span>
+      </button>
+    </div>
+
+    <div class="p-4 flex items-center justify-between gap-3 border-b border-[rgba(168,132,44,0.15)]">
+      <div class="relative flex-1 max-w-md">
+        <svg class="w-4 h-4 text-[#8a8171] absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Поиск по артикулу или названию..." class="w-full pl-10 pr-4 py-2 rounded-lg text-sm">
+      </div>
+      <button id="exportBtn" class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Выгрузить в Excel
+      </button>
+    </div>
+
+    <div class="overflow-x-auto scrollbar-thin" style="max-height: 620px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Артикул</th>
+            <th>Наименование</th>
+            <th class="text-right">Остаток</th>
+            <th class="text-right">Продажи/нед</th>
+            <th class="text-right">Запас факт</th>
+            <th class="text-right">Заказ было</th>
+            <th class="text-right">Рекомендация</th>
+            <th class="text-right">Запас дней (план)</th>
+            <th>Комментарий системы</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="emptyState" class="hidden p-12 text-center">
+      <div class="text-4xl mb-3">🏛️</div>
+      <div class="text-[#6f6757] text-lg font-semibold">Здесь пусто — Аннона не нашла, что исправлять</div>
+      <div class="text-[#8a8171] text-sm mt-1">Показываем только позиции, где система корректирует автозаказ</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 right-6 rounded-xl px-5 py-3 text-sm font-semibold shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[60]" style="background:#fdfbf4; color:#2f2b23; border:1px solid var(--gold-border);"></div>
+
+<!-- Application Scripts (ES Modules) -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
