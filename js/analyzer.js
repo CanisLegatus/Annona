@@ -112,8 +112,9 @@ function analyzeItem(raw, s, baseTarget) {
   if (it.isDeadStock && !it.criticalGap) {
     smart = 0;
   } else {
-    const targetAtDelivery = it.dailySales * baseTarget * promoBoost;
-    const availableAtDelivery = it.stock - leadSales + it.goodsInTransit + it.goodsInDelivery;
+    // Целевой запас на момент поставки должен быть в диапазоне [tMin, tMax], а не baseTarget
+    const targetAtDelivery = it.dailySales * tMin;
+    const availableAtDelivery = Math.max(0, it.stock + it.goodsInTransit + it.goodsInDelivery - leadSales);
     const ideal = targetAtDelivery - availableAtDelivery;
 
     if (ideal <= 0) {
