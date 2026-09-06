@@ -1,93 +1,8 @@
 /**
- * ANNONA — Утилиты (Utils)
- * Вспомогательные функции для работы с данными и DOM
+ * ANNONA — Единый бандл для работы без сервера (file:// протокол)
+ * Все функции объявлены в глобальной области видимости
  */
 
-/**
- * Получение элемента по ID
- * @param {string} id - ID элемента
- * @returns {HTMLElement|null}
- */
-const $ = (id) => document.getElementById(id);
-
-/**
- * Преобразование значения в число
- * @param {*} v - Значение
- * @returns {number}
- */
-function num(v) {
-  if (v === null || v === undefined || v === '') return 0;
-  if (typeof v === 'number') return v;
-  const p = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
-  return isNaN(p) ? 0 : p;
-}
-
-/**
- * Форматирование числа с разделителями тысяч
- * @param {number} n - Число
- * @returns {string}
- */
-function fmt(n) {
-  return new Intl.NumberFormat('ru-RU').format(Math.round(n));
-}
-
-/**
- * Форматирование денежной суммы
- * @param {number} n - Число
- * @returns {string}
- */
-function fmtMoney(n) {
-  return fmt(n) + ' ₽';
-}
-
-/**
- * Экранирование HTML-сущностей
- * @param {string} s - Строка
- * @returns {string}
- */
-function escapeHtml(s) {
-  if (!s) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-/**
- * Показ уведомления (toast)
- * @param {string} msg - Сообщение
- */
-function showToast(msg) {
-  const toast = $('toast');
-  if (!toast) return;
-  
-  toast.textContent = msg;
-  toast.style.transform = 'translateY(0)';
-  toast.style.opacity = '1';
-  
-  setTimeout(() => {
-    toast.style.transform = 'translateY(20px)';
-    toast.style.opacity = '0';
-  }, 3200);
-}
-
-/**
- * Проверка поддержки drag & drop
- * @returns {boolean}
- */
-function isDragDropSupported() {
-  return 'draggable' in document.createElement('div');
-}
-
-/**
- * Проверка расширения файла
- * @param {string} filename - Имя файла
- * @returns {boolean}
- */
-function isValidExcelFile(filename) {
-  return /\.xlsx?$/i.test(filename);
-}
 /**
  * ANNONA — Модуль состояния (State Management)
  * Хранит все данные приложения и настройки
@@ -178,11 +93,104 @@ function destroyAllCharts() {
   Object.values(state.charts).forEach(ch => ch && ch.destroy());
   state.charts = {};
 }
+
+
+/**
+ * ANNONA — Утилиты (Utils)
+ * Вспомогательные функции для работы с данными и DOM
+ */
+
+/**
+ * Получение элемента по ID
+ * @param {string} id - ID элемента
+ * @returns {HTMLElement|null}
+ */
+const $ = (id) => document.getElementById(id);
+
+/**
+ * Преобразование значения в число
+ * @param {*} v - Значение
+ * @returns {number}
+ */
+function num(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') return v;
+  const p = parseFloat(String(v).replace(/\s/g, '').replace(',', '.'));
+  return isNaN(p) ? 0 : p;
+}
+
+/**
+ * Форматирование числа с разделителями тысяч
+ * @param {number} n - Число
+ * @returns {string}
+ */
+function fmt(n) {
+  return new Intl.NumberFormat('ru-RU').format(Math.round(n));
+}
+
+/**
+ * Форматирование денежной суммы
+ * @param {number} n - Число
+ * @returns {string}
+ */
+function fmtMoney(n) {
+  return fmt(n) + ' ₽';
+}
+
+/**
+ * Экранирование HTML-сущностей
+ * @param {string} s - Строка
+ * @returns {string}
+ */
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/**
+ * Показ уведомления (toast)
+ * @param {string} msg - Сообщение
+ */
+function showToast(msg) {
+  const toast = $('toast');
+  if (!toast) return;
+  
+  toast.textContent = msg;
+  toast.style.transform = 'translateY(0)';
+  toast.style.opacity = '1';
+  
+  setTimeout(() => {
+    toast.style.transform = 'translateY(20px)';
+    toast.style.opacity = '0';
+  }, 3200);
+}
+
+/**
+ * Проверка поддержки drag & drop
+ * @returns {boolean}
+ */
+function isDragDropSupported() {
+  return 'draggable' in document.createElement('div');
+}
+
+/**
+ * Проверка расширения файла
+ * @param {string} filename - Имя файла
+ * @returns {boolean}
+ */
+function isValidExcelFile(filename) {
+  return /\.xlsx?$/i.test(filename);
+}
+
+
 /**
  * ANNONA — Бизнес-логика анализа данных (Analyzer)
  * Классификация товаров, расчёт рекомендаций, определение статусов
  */
-
 
 
 
@@ -444,11 +452,15 @@ function orderChangeText(it) {
   return `✓ Заказ без изменений (${it.orderFinal} шт).`;
 }
 
-// removed export: { orderChangeText };
+
+
 /**
  * ANNONA — Модуль работы с файлами (File Handler)
  * Загрузка, чтение и парсинг Excel-файлов
  */
+
+
+
 
 
 /**
@@ -704,10 +716,14 @@ function parseItemRow(row, colMap, cubeSet) {
     goodsInDelivery: num(row[colMap['Товар в поставке']])
   };
 }
+
+
 /**
  * ANNONA — Модуль пользовательского интерфейса (UI Renderer)
  * Отрисовка таблиц, графиков, KPI и обновление интерфейса
  */
+
+
 
 
 /**
@@ -1176,10 +1192,14 @@ function exportToExcel() {
 
   showToast(`Экспортировано ${items.length} позиций`);
 }
+
+
 /**
  * ANNONA — Главный файл приложения (Main Entry Point)
  * Инициализация и запуск приложения
  */
+
+
 
 
 /**
