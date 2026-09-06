@@ -310,16 +310,7 @@
 <!-- TOAST -->
 <div id="toast" class="fixed bottom-6 right-6 rounded-xl px-5 py-3 text-sm font-semibold shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[60]" style="background:#fdfbf4; color:#2f2b23; border:1px solid var(--gold-border);"></div>
 
-<!-- Application Scripts -->
-<script>
-  // Проверка протокола ДО загрузки скриптов
-  if (window.location.protocol === 'file:') {
-    // Локальное открытие - загружаем бандл
-    document.write('<scr' + 'ipt src="js/annona.bundle.js"><\/scr' + 'ipt>');
-  } else {
-    // Через сервер - загружаем ES модули
-    document.write('<scr' + 'ipt type="module" src="js/main.js" crossorigin="anonymous"><\/scr' + 'ipt>');
-  }
-</script>
+<!-- Application Scripts - локальная загрузка без сервера -->
+<script src="js/annona.bundle.js"></script>
 </body>
 </html>
