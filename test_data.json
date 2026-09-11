@@ -1,0 +1,281 @@
+{
+  "testCases": [
+    {
+      "name": "Критический разрыв - остаток меньше чем нужно на период поставки",
+      "input": {
+        "code": "TEST-001",
+        "name": "Товар с критическим разрывом",
+        "cubeCategory": "TEST",
+        "stock": 5,
+        "salesW4": 20,
+        "salesW3": 18,
+        "salesW2": 22,
+        "salesW1": 21,
+        "salesTotal": 81,
+        "orderFinal": 10,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "critical",
+        "dailySalesApprox": 3,
+        "leadSalesApprox": 18
+      }
+    },
+    {
+      "name": "Неликвид - продаж нет, остаток есть",
+      "input": {
+        "code": "TEST-002",
+        "name": "Неликвид",
+        "cubeCategory": "TEST",
+        "stock": 50,
+        "salesW4": 0,
+        "salesW3": 0,
+        "salesW2": 0,
+        "salesW1": 0,
+        "salesTotal": 0,
+        "orderFinal": 0,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "normal",
+        "isDeadStock": true,
+        "smartOrder": 0
+      }
+    },
+    {
+      "name": "Пересток - запас больше 60 дней",
+      "input": {
+        "code": "TEST-003",
+        "name": "Пересток",
+        "cubeCategory": "TEST",
+        "stock": 300,
+        "salesW4": 10,
+        "salesW3": 12,
+        "salesW2": 8,
+        "salesW1": 10,
+        "salesTotal": 40,
+        "orderFinal": 20,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "overstock",
+        "smartOrderLessThanCurrent": true
+      }
+    },
+    {
+      "name": "Аномалия продаж - всплеск на одной неделе",
+      "input": {
+        "code": "TEST-004",
+        "name": "Аномалия",
+        "cubeCategory": "TEST",
+        "stock": 50,
+        "salesW4": 10,
+        "salesW3": 12,
+        "salesW2": 11,
+        "salesW1": 50,
+        "salesTotal": 83,
+        "orderFinal": 30,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "anomalyFlag": true,
+        "anomalyWeek": 1
+      }
+    },
+    {
+      "name": "Промо товар - должен иметь увеличенный целевой запас",
+      "input": {
+        "code": "TEST-005",
+        "name": "Промо товар",
+        "cubeCategory": "TEST",
+        "stock": 30,
+        "salesW4": 15,
+        "salesW3": 18,
+        "salesW2": 20,
+        "salesW1": 22,
+        "salesTotal": 75,
+        "orderFinal": 20,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "Акция 1",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "promo"
+      }
+    },
+    {
+      "name": "Норма - все в балансе",
+      "input": {
+        "code": "TEST-006",
+        "name": "Нормальный товар",
+        "cubeCategory": "TEST",
+        "stock": 100,
+        "salesW4": 20,
+        "salesW3": 22,
+        "salesW2": 18,
+        "salesW1": 20,
+        "salesTotal": 80,
+        "orderFinal": 30,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "normal"
+      }
+    },
+    {
+      "name": "МТЗ - минимальная товарная заполненность",
+      "input": {
+        "code": "TEST-007",
+        "name": "Товар с МТЗ",
+        "cubeCategory": "TEST",
+        "stock": 5,
+        "salesW4": 2,
+        "salesW3": 1,
+        "salesW2": 2,
+        "salesW1": 1,
+        "salesTotal": 6,
+        "orderFinal": 0,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 20,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "mtzApplied": true,
+        "smartOrderAtLeast": 15
+      }
+    },
+    {
+      "name": "Минимальная партия",
+      "input": {
+        "code": "TEST-008",
+        "name": "Товар с мин. партией",
+        "cubeCategory": "TEST",
+        "stock": 20,
+        "salesW4": 15,
+        "salesW3": 14,
+        "salesW2": 16,
+        "salesW1": 15,
+        "salesTotal": 60,
+        "orderFinal": 10,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 50,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "smartOrderMultipleOf": 50
+      }
+    },
+    {
+      "name": "Товар в пути и поставке",
+      "input": {
+        "code": "TEST-009",
+        "name": "Товар в пути",
+        "cubeCategory": "TEST",
+        "stock": 30,
+        "salesW4": 20,
+        "salesW3": 18,
+        "salesW2": 22,
+        "salesW1": 20,
+        "salesTotal": 80,
+        "orderFinal": 50,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 40,
+        "goodsInDelivery": 20,
+        "costPrice": 100
+      },
+      "expected": {
+        "totalIncoming": 60
+      }
+    },
+    {
+      "name": "Нет продаж и нет остатка - не требуется заказ",
+      "input": {
+        "code": "TEST-010",
+        "name": "Пустой товар",
+        "cubeCategory": "TEST",
+        "stock": 0,
+        "salesW4": 0,
+        "salesW3": 0,
+        "salesW2": 0,
+        "salesW1": 0,
+        "salesTotal": 0,
+        "orderFinal": 0,
+        "rec": 0,
+        "orderUM": 0,
+        "minBatch": 1,
+        "mtz": 0,
+        "promo": "",
+        "goodsInTransit": 0,
+        "goodsInDelivery": 0,
+        "costPrice": 100
+      },
+      "expected": {
+        "status": "normal",
+        "smartOrder": 0
+      }
+    }
+  ],
+  "settings": {
+    "targetDaysMin": 24,
+    "targetDaysMax": 30,
+    "overstockThreshold": 60,
+    "leadTimeDays": 6,
+    "anomalyMultiplier": 2,
+    "deadStockThreshold": 2,
+    "excludedCubes": []
+  }
+}
