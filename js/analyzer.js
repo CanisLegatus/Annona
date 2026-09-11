@@ -142,7 +142,7 @@ function analyzeItem(raw, s, baseTarget) {
         if (atDel > s.overstockThreshold) score -= (atDel - s.overstockThreshold) * 5;
         score -= c * 1e-6; // при прочих равных — меньший заказ
         
-        if (!best || score > best.score) best = { c, atDel };
+        if (!best || score > best.score) best = { c, atDel, score };
       });
 
       smart = best ? best.c : 0;
